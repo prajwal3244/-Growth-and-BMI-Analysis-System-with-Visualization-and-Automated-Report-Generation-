@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        .header { text-align: center; margin-bottom: 20px; }
+        .content { margin: 20px; }
+        .footer { text-align: center; margin-top: 30px; font-size: 12px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>{{ title }}</h1>
+        <p>{{ subtitle }}</p>
+    </div>
+    <div class="content">
+        <h2>Report Content</h2>
+        <p>{{ content }}</p>
+        <ul>
+            {% for item in items %}
+                <li>{{ item }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    
+   s
+    <div class="footer">
+        <p>Generated on: {{ date }}</p>
+        <p class="page-number">Page <span class="page"></span> of <span class="pages"></span></p>
+    </div>
+    
+</body>
+</html>
