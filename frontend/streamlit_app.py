@@ -23,6 +23,7 @@ if str(_SRC) not in sys.path:
 
 import streamlit as st
 
+from _accessibility import accessibility_controls, apply_accessibility, speak
 from growthai import __version__
 from growthai.chatbot.providers import get_chat_provider
 from growthai.core.domain import Gender, Measurement, Standard
@@ -89,6 +90,10 @@ with st.sidebar:
     standard = st.selectbox("Reference standard", [s.value for s in Standard], index=0)
     st.caption("Switch between WHO, CDC and IAP (Indian) standards.")
     go = st.button("🔬 Analyze", use_container_width=True, type="primary")
+
+# Accessibility panel (feature #19) - large fonts, color-blind mode, text-to-speech.
+a11y = accessibility_controls()
+apply_accessibility(a11y)
 
 gender = Gender.MALE if gender_label == "Male" else Gender.FEMALE
 
@@ -170,6 +175,7 @@ with t_nutrition:
 with t_explain:
     ex = analysis.explanation
     st.info(ex.summary)
+    speak(ex.summary, a11y["tts"])  # read the result aloud when enabled (feature #19)
     st.plotly_chart(charts.feature_importance_bar(ex.feature_importance), use_container_width=True)
     st.markdown("##### Why this prediction")
     for driver in ex.drivers:
@@ -196,4 +202,9 @@ with t_chat:
             st.markdown(answer)
 
 st.divider()
+_method = "WHO LMS (exact)" if growth.reference.uses_lms else "log-normal approximation"
+st.caption(
+    f"Reference method: **{_method}** · Standard: **{std.value}**. "
+    "Add official WHO LMS tables to `datasets/who/lms/` to enable exact z-scores."
+)
 st.caption("⚕️ GrowthAI is an educational decision-support tool, not a medical device. Always consult a paediatrician.")
