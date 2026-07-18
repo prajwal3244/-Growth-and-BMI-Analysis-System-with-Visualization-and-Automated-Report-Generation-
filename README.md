@@ -9,7 +9,7 @@
 ![FastAPI](https://img.shields.io/badge/API-FastAPI-009688?logo=fastapi&logoColor=white)
 ![Streamlit](https://img.shields.io/badge/UI-Streamlit-FF4B4B?logo=streamlit&logoColor=white)
 ![scikit-learn](https://img.shields.io/badge/ML-scikit--learn-F7931E?logo=scikitlearn&logoColor=white)
-![Coverage](https://img.shields.io/badge/coverage-88%25-brightgreen)
+![Coverage](https://img.shields.io/badge/coverage-84%25-brightgreen)
 ![License](https://img.shields.io/badge/license-MIT-green)
 ![Version](https://img.shields.io/badge/version-1.0.0-blueviolet)
 ![Code style](https://img.shields.io/badge/lint-ruff-000000?logo=ruff)
@@ -36,7 +36,9 @@
 | 💬 | **AI health assistant** | **Offline RAG** over WHO/CDC guidelines — works with **zero API keys**; pluggable OpenAI/Gemini adapter |
 | 📈 | **Interactive charts** | Plotly gauge, radar, percentile curves, forecast graphs, risk profile |
 | 📄 | **Smart reports** | Hospital-grade HTML/PDF with charts, **QR code**, and doctor's-notes section |
-| 🌍 | **Multi-standard** | Switch between **WHO · CDC · IAP (Indian)** references at runtime |
+| 🌍 | **Multi-standard** | Switch between **WHO · CDC · IAP (Indian)** references; exact **WHO LMS** z-scores auto-activate when official tables are installed |
+| 📊 | **Population analytics** | Average BMI, category & age distributions, gender comparison, obesity trend |
+| ♿ | **Accessibility** | Large-font mode, color-blind-safe palette, offline text-to-speech, dark mode |
 | 🔐 | **Multi-user backend** | FastAPI + JWT auth, roles (parent/doctor/admin), patient history, SQLAlchemy (SQLite/Postgres) |
 
 ---
@@ -76,7 +78,7 @@ make install-dev          # or: pip install -r requirements.txt && pip install -
 
 make run-api              # FastAPI  → http://localhost:8000/docs
 make run-dashboard        # Streamlit→ http://localhost:8501
-make test                 # 26 tests, ~88% coverage
+make test                 # 33 tests, ~84% coverage
 ```
 
 > On Windows, PDF export needs GTK for WeasyPrint; without it, reports fall back to
@@ -109,7 +111,7 @@ Interactive Swagger UI at **`/docs`**, ReDoc at **`/redoc`**.
 
 ## 🧪 Quality
 
-- **26 tests** (unit + integration + API) · **~88% coverage** · ruff-linted
+- **33 tests** (unit + integration + API) · **~84% coverage** · ruff-linted
 - CI on Python **3.10 / 3.11 / 3.12** + Docker build (GitHub Actions)
 - Type hints, structured logging, typed config, custom exception hierarchy
 
@@ -133,10 +135,12 @@ src/growthai/
 ├── reports/      # Jinja2 templates + HTML/PDF renderer
 ├── db/           # SQLAlchemy models, session
 ├── api/          # FastAPI app, JWT auth, routers, schemas
+├── data/lms.py   # exact WHO LMS z-score engine (auto-activates)
 └── cli.py        # command-line interface
-frontend/         # Streamlit dashboard
-datasets/         # WHO growth reference CSVs
-tests/            # pytest suite
+frontend/         # Streamlit dashboard + pages/ (analytics, accessibility)
+datasets/         # WHO reference CSVs + who/lms/ (drop official LMS tables here)
+scripts/          # fetch_who_lms.py — pull official WHO LMS tables
+tests/            # pytest suite (33 tests)
 docs/             # architecture, migration plan, roadmap
 legacy/           # the original GrowthInsight.py, preserved
 ```

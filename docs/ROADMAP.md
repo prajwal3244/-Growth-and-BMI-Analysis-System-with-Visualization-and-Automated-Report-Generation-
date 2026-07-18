@@ -17,14 +17,17 @@ Legend: ✅ shipped · 🚧 in progress · 🔭 planned
 - ✅ FastAPI backend: JWT auth, CRUD, Swagger docs
 - ✅ SQLAlchemy models (SQLite dev / Postgres prod)
 - ✅ Streamlit dashboard: dark mode, cards, charts, analytics, chatbot
-- ✅ Pytest suite, Docker, docker-compose, GitHub Actions CI
+- ✅ **WHO LMS reference engine** (exact L/M/S z-scores) with auto-activation + fetch script
+- ✅ **Population analytics dashboard** (avg BMI, category/age distribution, gender, obesity trend)
+- ✅ **Accessibility**: large fonts, color-blind-safe palette, offline text-to-speech, dark mode
+- ✅ Pytest suite (33 tests), Docker, docker-compose, GitHub Actions CI
 
 ## Planned
 - 🔭 React + Next.js public frontend (Streamlit becomes clinician/admin console)
-- 🔭 Real WHO LMS percentile tables (replace median-only reference with full L/M/S curves)
+- 🔭 Ship the full official WHO LMS tables via `scripts/fetch_who_lms.py` in CI
 - 🔭 Wearable & IoT integration: Google Fit, Apple Health, smart scales
 - 🔭 Mobile app (React Native / Flutter)
-- 🔭 Multi-language + full accessibility (voice, color-blind mode, large fonts)
+- 🔭 Multi-language support + speech-to-text input
 - 🔭 Population analytics warehouse + admin BI dashboards
 - 🔭 Model registry + MLflow experiment tracking
 - 🔭 Cloud deploy templates: Render, Railway, Azure, AWS
