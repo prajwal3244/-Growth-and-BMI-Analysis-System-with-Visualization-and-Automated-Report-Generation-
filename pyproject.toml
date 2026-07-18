@@ -1,0 +1,54 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "growthai"
+version = "1.0.0"
+description = "AI-powered growth, nutrition, risk & forecasting health-intelligence platform for children and young adults."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "prajwal3244" }]
+keywords = ["healthcare", "bmi", "growth", "who", "machine-learning", "fastapi", "streamlit"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Intended Audience :: Healthcare Industry",
+    "Topic :: Scientific/Engineering :: Medical Science Apps.",
+]
+dynamic = ["dependencies"]
+
+[project.urls]
+Homepage = "https://github.com/prajwal3244/-Growth-and-BMI-Analysis-System-with-Visualization-and-Automated-Report-Generation-"
+Repository = "https://github.com/prajwal3244/-Growth-and-BMI-Analysis-System-with-Visualization-and-Automated-Report-Generation-"
+
+[tool.setuptools.dynamic]
+dependencies = { file = ["requirements.txt"] }
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[project.scripts]
+growthai = "growthai.cli:main"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q --cov=growthai --cov-report=term-missing"
+pythonpath = ["src"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+# E501: long lines are fine with our formatter width.
+# B008: `Depends(...)` / `Depends()` in defaults is the idiomatic FastAPI pattern.
+ignore = ["E501", "B008"]
+
+[tool.mypy]
+python_version = "3.10"
+ignore_missing_imports = true
+mypy_path = "src"

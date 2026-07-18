@@ -1,0 +1,46 @@
+services:
+  api:
+    build: .
+    container_name: growthai-api
+    command: uvicorn growthai.api.main:app --host 0.0.0.0 --port 8000
+    ports:
+      - "8000:8000"
+    environment:
+      GROWTHAI_ENV: production
+      GROWTHAI_DATABASE_URL: postgresql+psycopg2://growthai:growthai@db:5432/growthai
+      GROWTHAI_SECRET_KEY: ${GROWTHAI_SECRET_KEY:-change-me-in-production}
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+
+  dashboard:
+    build: .
+    container_name: growthai-dashboard
+    command: streamlit run frontend/streamlit_app.py --server.port 8501 --server.address 0.0.0.0
+    ports:
+      - "8501:8501"
+    environment:
+      GROWTHAI_ENV: production
+    depends_on:
+      - api
+    restart: unless-stopped
+
+  db:
+    image: postgres:16-alpine
+    container_name: growthai-db
+    environment:
+      POSTGRES_USER: growthai
+      POSTGRES_PASSWORD: growthai
+      POSTGRES_DB: growthai
+    volumes:
+      - growthai_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U growthai"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+volumes:
+  growthai_pgdata:
