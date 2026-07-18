@@ -171,3 +171,42 @@ def population_age_distribution(ages_years: list[float], dark: bool = True) -> g
     fig.update_xaxes(title="Age (years)")
     fig.update_yaxes(title="Count")
     return _base_layout(fig, "Population age distribution", dark=dark)
+
+
+_CATEGORY_COLOR = {
+    "Underweight": AMBER, "Normal Weight": GREEN, "Overweight": AMBER, "Obesity": RED,
+}
+
+
+def category_distribution_pie(counts: dict[str, int], dark: bool = True) -> go.Figure:
+    """Analytics: BMI category share across the population (feature #18)."""
+    labels = list(counts.keys())
+    fig = go.Figure(
+        go.Pie(
+            labels=labels, values=list(counts.values()), hole=0.55,
+            marker=dict(colors=[_CATEGORY_COLOR.get(c, GREY) for c in labels]),
+        )
+    )
+    return _base_layout(fig, "BMI category distribution", dark=dark)
+
+
+def gender_bmi_comparison(gender_avg: dict[str, float], dark: bool = True) -> go.Figure:
+    """Analytics: average BMI by gender (feature #18)."""
+    genders = [g.capitalize() for g in gender_avg]
+    fig = go.Figure(
+        go.Bar(x=genders, y=list(gender_avg.values()), marker_color=[TEAL, AMBER][: len(genders)],
+               text=[f"{v:.1f}" for v in gender_avg.values()], textposition="auto")
+    )
+    fig.update_yaxes(title="Average BMI")
+    return _base_layout(fig, "Average BMI by gender", dark=dark)
+
+
+def obesity_trend(age_bands: list[int], rates: list[float], dark: bool = True) -> go.Figure:
+    """Analytics: overweight/obesity rate by age band (feature #18)."""
+    fig = go.Figure(
+        go.Scatter(x=age_bands, y=rates, mode="lines+markers", fill="tozeroy",
+                   line=dict(color=RED, width=3))
+    )
+    fig.update_xaxes(title="Age band (years)")
+    fig.update_yaxes(title="Overweight + obese (%)", range=[0, 100])
+    return _base_layout(fig, "Overweight/obesity trend by age", dark=dark)
