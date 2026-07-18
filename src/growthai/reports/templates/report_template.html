@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<style>
+  @page { size: A4; margin: 1.4cm; @bottom-center { content: "GrowthAI Health Report - Page " counter(page) " of " counter(pages); font-size: 9px; color: #8b98a5; } }
+  * { box-sizing: border-box; }
+  body { font-family: "Helvetica Neue", Arial, sans-serif; color: #16222e; font-size: 12px; line-height: 1.5; }
+  .brandbar { display: flex; justify-content: space-between; align-items: center; border-bottom: 4px solid #12b3a6; padding-bottom: 12px; }
+  .brand { font-size: 26px; font-weight: 800; color: #0f2b46; letter-spacing: -0.5px; }
+  .brand span { color: #12b3a6; }
+  .brand small { display:block; font-size: 10px; font-weight: 500; color:#8b98a5; letter-spacing: 2px; }
+  .qr { text-align: right; }
+  .qr img { width: 78px; height: 78px; }
+  .qr small { display:block; font-size: 8px; color:#8b98a5; }
+  h2 { color: #0f2b46; font-size: 15px; border-left: 4px solid #12b3a6; padding-left: 8px; margin: 18px 0 8px; }
+  .grid { display: flex; flex-wrap: wrap; gap: 10px; }
+  .card { flex: 1 1 30%; background: #f5f8fa; border-radius: 8px; padding: 10px 12px; border: 1px solid #e3ebf0; }
+  .card .k { font-size: 9px; text-transform: uppercase; letter-spacing: 1px; color: #8b98a5; }
+  .card .v { font-size: 18px; font-weight: 700; color: #0f2b46; }
+  .pill { display:inline-block; padding: 2px 10px; border-radius: 999px; font-weight:700; font-size: 11px; color:#fff; }
+  .pill.low, .pill.normal { background:#30a46c; }
+  .pill.medium, .pill.overweight, .pill.underweight { background:#f5a524; }
+  .pill.high, .pill.obesity { background:#e5484d; }
+  table { width: 100%; border-collapse: collapse; margin-top: 6px; }
+  th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid #e3ebf0; font-size: 11px; }
+  th { background:#0f2b46; color:#fff; font-weight:600; }
+  .chart { width: 100%; margin: 8px 0; }
+  .chart img { width: 100%; border: 1px solid #e3ebf0; border-radius: 8px; }
+  .two { display:flex; gap:10px; }
+  .two > div { flex: 1; }
+  ul { margin: 4px 0 4px 16px; padding: 0; }
+  .muted { color:#8b98a5; }
+  .disclaimer { margin-top: 18px; padding: 10px; background:#fff7ed; border:1px solid #f5a524; border-radius:8px; font-size:10px; color:#7a5b12; }
+  .notes { min-height: 60px; border:1px dashed #b6c2cc; border-radius:8px; padding:8px; color:#8b98a5; }
+</style>
+</head>
+<body>
+  <div class="brandbar">
+    <div>
+      <div class="brand">Growth<span>AI</span><small>HEALTH INTELLIGENCE REPORT</small></div>
+    </div>
+    <div class="qr">
+      {% if qr_data_uri %}<img src="{{ qr_data_uri }}" alt="QR" />{% endif %}
+      <small>Scan to verify</small>
+    </div>
+  </div>
+
+  <p class="muted">Report ID: {{ report_id }} &nbsp;|&nbsp; Standard: {{ standard }} &nbsp;|&nbsp; Generated: {{ date }}</p>
+
+  <h2>Patient profile</h2>
+  <div class="grid">
+    <div class="card"><div class="k">Name</div><div class="v">{{ patient.name }}</div></div>
+    <div class="card"><div class="k">Age</div><div class="v">{{ patient.age_years }} yrs</div></div>
+    <div class="card"><div class="k">Gender</div><div class="v">{{ patient.gender|capitalize }}</div></div>
+    <div class="card"><div class="k">Height</div><div class="v">{{ patient.height_cm }} cm</div></div>
+    <div class="card"><div class="k">Weight</div><div class="v">{{ patient.weight_kg }} kg</div></div>
+    <div class="card"><div class="k">BMI</div><div class="v">{{ assessment.bmi }}</div></div>
+  </div>
+
+  <h2>Growth assessment</h2>
+  <div class="grid">
+    <div class="card"><div class="k">Category</div><div class="v"><span class="pill {{ assessment.category_class }}">{{ assessment.category }}</span></div></div>
+    <div class="card"><div class="k">BMI z-score</div><div class="v">{{ assessment.z_score }}</div></div>
+    <div class="card"><div class="k">Percentile</div><div class="v">{{ assessment.percentile }}</div></div>
+  </div>
+  <div class="two">
+    {% if charts.gauge %}<div class="chart"><img src="{{ charts.gauge }}" /></div>{% endif %}
+    {% if charts.percentile %}<div class="chart"><img src="{{ charts.percentile }}" /></div>{% endif %}
+  </div>
+
+  <h2>AI growth forecast</h2>
+  <table>
+    <tr><th>Horizon</th><th>Height (cm)</th><th>Weight (kg)</th><th>BMI</th><th>Confidence</th></tr>
+    {% for f in forecasts %}
+    <tr><td>{{ f.horizon }}</td><td>{{ f.height_cm }}</td><td>{{ f.weight_kg }}</td><td>{{ f.bmi }}</td><td>{{ f.confidence }}%</td></tr>
+    {% endfor %}
+  </table>
+  {% if charts.forecast %}<div class="chart"><img src="{{ charts.forecast }}" /></div>{% endif %}
+  <p class="muted"><strong>Why:</strong> {{ explanation.summary }}</p>
+
+  <h2>Health risk analysis</h2>
+  <p>Overall risk: <span class="pill {{ risk.overall_class }}">{{ risk.overall_level }}</span></p>
+  <table>
+    <tr><th>Risk</th><th>Level</th><th>Explanation</th></tr>
+    {% for r in risk.risks %}
+    <tr><td>{{ r.name }}</td><td><span class="pill {{ r.level|lower }}">{{ r.level }}</span></td><td>{{ r.explanation }}</td></tr>
+    {% endfor %}
+  </table>
+
+  <h2>Nutrition &amp; lifestyle plan</h2>
+  <div class="grid">
+    <div class="card"><div class="k">Calories</div><div class="v">{{ nutrition.daily_targets.calories_kcal }}</div></div>
+    <div class="card"><div class="k">Protein</div><div class="v">{{ nutrition.daily_targets.protein_g }} g</div></div>
+    <div class="card"><div class="k">Fat</div><div class="v">{{ nutrition.daily_targets.fat_g }} g</div></div>
+    <div class="card"><div class="k">Carbs</div><div class="v">{{ nutrition.daily_targets.carbs_g }} g</div></div>
+    <div class="card"><div class="k">Water</div><div class="v">{{ nutrition.daily_targets.water_ml }} ml</div></div>
+    <div class="card"><div class="k">Sleep</div><div class="v">{{ nutrition.lifestyle.sleep }}</div></div>
+  </div>
+  <p><strong>Exercise:</strong> {{ nutrition.lifestyle.exercise }}<br/>
+     <strong>Screen time:</strong> {{ nutrition.lifestyle.screen_time }} &nbsp;|&nbsp;
+     <strong>School:</strong> {{ nutrition.lifestyle.school_activity }}</p>
+  <p><strong>Recommended foods:</strong></p>
+  <ul>{% for food in nutrition.food_suggestions %}<li>{{ food }}</li>{% endfor %}</ul>
+
+  <h2>Weekly meal plan</h2>
+  <table>
+    <tr><th>Day</th><th>Breakfast</th><th>Lunch</th><th>Dinner</th></tr>
+    {% for day, meals in nutrition.weekly_meal_plan.items() %}
+    <tr><td><strong>{{ day }}</strong></td><td>{{ meals.breakfast }}</td><td>{{ meals.lunch }}</td><td>{{ meals.dinner }}</td></tr>
+    {% endfor %}
+  </table>
+
+  <h2>Doctor's notes</h2>
+  <div class="notes">{{ doctor_notes or "____________________________________________________" }}</div>
+
+  <div class="disclaimer">
+    <strong>Disclaimer:</strong> GrowthAI is an educational decision-support tool, not a medical
+    device. It does not diagnose or treat any condition. Reference values are approximate.
+    Always consult a qualified paediatrician for medical decisions.
+  </div>
+</body>
+</html>
