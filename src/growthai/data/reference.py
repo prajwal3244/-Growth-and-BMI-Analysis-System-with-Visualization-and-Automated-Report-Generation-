@@ -28,6 +28,7 @@ from scipy.stats import norm
 from growthai.config import get_settings
 from growthai.core.domain import Gender, Standard
 from growthai.core.exceptions import ReferenceDataError, UnsupportedStandardError
+from growthai.data.lms import get_lms_provider
 from growthai.logging_conf import get_logger
 
 logger = get_logger("data.reference")
@@ -160,18 +161,30 @@ class ReferenceDataService:
         )
 
     def z_score(self, gender: Gender, age_months: float, metric_key: str, value: float) -> float:
-        """Approximate z-score of ``value`` vs the age median.
+        """z-score of ``value`` vs the age distribution.
 
-        ``metric_key`` is one of 'height', 'weight', 'bmi'. Uses a log-normal
-        assumption (anthropometry is right-skewed), which keeps z-scores sane
-        at the extremes far better than a plain normal model.
+        ``metric_key`` is one of 'height', 'weight', 'bmi'. Prefers the exact
+        WHO **LMS** method when official tables are installed (see
+        :mod:`growthai.data.lms`); otherwise falls back to a documented
+        log-normal approximation around the age median.
         """
+        lms = get_lms_provider()
+        if lms.available(gender, metric_key):
+            table = lms.table(gender, metric_key)
+            assert table is not None
+            return table.z_score(age_months, value)
+
         median_map = {"height": "height_cm", "weight": "weight_kg", "bmi": "bmi"}
         median = self.median(gender, age_months, median_map[metric_key])
         if median <= 0 or value <= 0:
             return 0.0
         sigma_log = _CV[metric_key]
         return float(np.log(value / median) / sigma_log)
+
+    @property
+    def uses_lms(self) -> bool:
+        """True when the exact WHO LMS engine is backing z-scores."""
+        return get_lms_provider().is_active
 
     def percentile(self, gender: Gender, age_months: float, metric_key: str, value: float) -> float:
         """Percentile (0-100) corresponding to the z-score."""
